@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NMC Process Quiz</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: auto;
+      padding: 20px;
+    }
+    h2 {
+      text-align: center;
+    }
+    form > div {
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+    }
+    input[type="submit"] {
+      padding: 10px 20px;
+      font-size: 16px;
+    }
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <h2>NMC Process Quiz</h2>
+  <form id="quizForm">
+    <!-- Questions 1 to 15 -->
+  </form>
+  <div id="result" class="hidden"></div>
+
+  <script>
+    const questions = [
+      {
+        q: "What is the minimum writing score required in IELTS for NMC eligibility?",
+        options: ["7", "6.5", "6", "7.5"],
+        answer: "6.5"
+      },
+      {
+        q: "Which of the following is NOT an accepted English language proof for NMC?",
+        options: ["IELTS", "OET", "TOEFL", "SIFE"],
+        answer: "TOEFL"
+      },
+      {
+        q: "What is the initial fee for NMC application evaluation?",
+        options: ["\u00a3153", "\u00a3100", "\u00a3140", "\u00a3794"],
+        answer: "\u00a3140"
+      },
+      {
+        q: "How many parts does the Test of Competences have?",
+        options: ["1", "2", "3", "4"],
+        answer: "2"
+      },
+      {
+        q: "What does OSCE stand for?",
+        options: ["Online Structured Clinical Examination", "Objective Structured Clinical Examination", "Organized Screening of Clinical Expertise", "Official Skill Competence Evaluation"],
+        answer: "Objective Structured Clinical Examination"
+      },
+      {
+        q: "What is the structure of the CBT?",
+        options: ["50 questions total", "3 parts – numeracy, theory, practical", "15 numeracy + 100 clinical questions", "100 MCQs only"],
+        answer: "15 numeracy + 100 clinical questions"
+      },
+      {
+        q: "Which organization conducts the CBT exam?",
+        options: ["NMC", "OET", "IELTS UKVI", "Pearson VUE"],
+        answer: "Pearson VUE"
+      },
+      {
+        q: "How many attempts are allowed for CBT per application?",
+        options: ["Unlimited", "2", "3", "4"],
+        answer: "3"
+      },
+      {
+        q: "If a candidate fails CBT 3 times, what is the next step?",
+        options: ["Appeal to NMC", "Wait 3 months", "Reapply after 6 months", "Attempt OSCE directly"],
+        answer: "Reapply after 6 months"
+      },
+      {
+        q: "Where is the OSCE conducted?",
+        options: ["Online", "NMC London HQ", "Test centers in the UK only", "Any hospital abroad"],
+        answer: "Test centers in the UK only"
+      },
+      {
+        q: "How much is the exam fee for OSCE?",
+        options: ["\u00a3397", "\u00a3153", "\u00a3794", "\u00a3100"],
+        answer: "\u00a3794"
+      },
+      {
+        q: "What is the fee for OSCE re-sit if 4 stations are failed?",
+        options: ["\u00a3397", "\u00a3794", "\u00a3153", "\u00a3250"],
+        answer: "\u00a3397"
+      },
+      {
+        q: "Which of the following statements is TRUE?",
+        options: ["SIFE applies only if a candidate has worked 6 months", "CBT and OSCE can be taken in any order", "CBT can only be taken in the UK", "OSCE is valid for 5 years"],
+        answer: "CBT and OSCE can be taken in any order"
+      },
+      {
+        q: "What is the minimum experience required under SIFE for English proof?",
+        options: ["6 months", "18 months", "12 months", "24 months"],
+        answer: "12 months"
+      },
+      {
+        q: "In CBT, is there any negative marking for wrong answers?",
+        options: ["Yes", "No"],
+        answer: "No"
+      }
+    ];
+
+    const form = document.getElementById("quizForm");
+    const resultDiv = document.getElementById("result");
+
+    questions.forEach((item, index) => {
+      const qDiv = document.createElement("div");
+      const label = document.createElement("label");
+      label.textContent = `${index + 1}. ${item.q}`;
+      qDiv.appendChild(label);
+      item.options.forEach(option => {
+        const input = document.createElement("input");
+        input.type = "radio";
+        input.name = `q${index}`;
+        input.value = option;
+        input.required = true;
+        qDiv.appendChild(input);
+        qDiv.appendChild(document.createTextNode(option));
+        qDiv.appendChild(document.createElement("br"));
+      });
+      form.appendChild(qDiv);
+    });
+
+    const submit = document.createElement("input");
+    submit.type = "submit";
+    submit.value = "Submit Quiz";
+    form.appendChild(submit);
+
+    form.onsubmit = function (e) {
+      e.preventDefault();
+      let score = 0;
+      questions.forEach((item, index) => {
+        const selected = form[`q${index}`].value;
+        if (selected === item.answer) score++;
+      });
+
+      const passed = score >= 12;
+      resultDiv.classList.remove("hidden");
+      resultDiv.innerHTML = `
+        <h3>Your Score: ${score}/15</h3>
+        <p>${passed ? "Congratulations! You passed." : "You did not pass. Please review the material and try again later."}</p>
+      `;
+
+      // Send to Formspree
+      fetch("https://formspree.io/f/mgvyzrka", {
+        method: "POST",
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          email: "nandhu.poweroins@gmail.com",
+          subject: "NMC Quiz Submission",
+          message: `Score: ${score}/15. Result: ${passed ? "Pass" : "Fail"}`
+        })
+      });
+
+      form.querySelectorAll("input").forEach(i => i.disabled = true);
+      submit.disabled = true;
+    }
+  </script>
+</body>
+</html>
